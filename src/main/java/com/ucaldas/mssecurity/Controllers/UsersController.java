@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
 @CrossOrigin
 @RestController
 @RequestMapping("/api/users")
@@ -30,10 +29,14 @@ public class UsersController {
 
     @Autowired
     private RoleRepository theRoleRepository;
-    @GetMapping ("")
-    public List<User> findAll(){return this.theUserRepository.findAll();}
+
+    @GetMapping()
+    public List<User> findAll() {
+        return this.theUserRepository.findAll();
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
-    
+
     @PostMapping("public")
     public User create(@Valid @RequestBody User theNewUser) {
         if (!isValidEmail(theNewUser.getEmail())) {
@@ -45,8 +48,9 @@ public class UsersController {
             return null;
         }
         theNewUser.setPassword(theEncryptionService.convertSHA256(theNewUser.getPassword()));
-        return this.theUserRepository.save(theNewUser);}
-    
+        return this.theUserRepository.save(theNewUser);
+    }
+
     @GetMapping("{id}")
     public User findById(@PathVariable String id) {
         User theUser = this.theUserRepository
@@ -69,7 +73,6 @@ public class UsersController {
             return null;
         }
     }
-
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{id}")
@@ -103,7 +106,6 @@ public class UsersController {
         }
     }
 
-
     @PutMapping("{userId}/unmatch-role/{roleId}")
     public User unMatchRole(@PathVariable String userId, @PathVariable String roleId) {
         User theActualUser = this.theUserRepository
@@ -128,7 +130,7 @@ public class UsersController {
         if (StringUtils.isEmpty(email)) {
             return false;
         }
-        
+
         // Validar la sintaxis del email usando una expresión regular
         boolean isValidFormat = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$").matcher(email).matches();
         if (!isValidFormat) {
@@ -143,7 +145,8 @@ public class UsersController {
         if (StringUtils.isEmpty(password)) {
             return false;
         }
-        boolean isValidFormat = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$").matcher(password).matches();
+        boolean isValidFormat = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$")
+                .matcher(password).matches();
         return isValidFormat;
     }
 

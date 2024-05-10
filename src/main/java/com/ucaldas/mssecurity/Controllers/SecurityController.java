@@ -53,7 +53,7 @@ public class SecurityController {
     }
 
     @PutMapping("/secondauth")
-    public String secondAuth(@RequestBody Map<String, String> requestBody,
+    public Map<String, String> secondAuth(@RequestBody Map<String, String> requestBody,
                              final HttpServletResponse response) throws IOException{
         String id = requestBody.get("id");
         User theUser = this.theUserRepository
@@ -73,7 +73,7 @@ public class SecurityController {
 
             }
         }
-        return token;
+        return Map.of("token", token);
     }
 
     @PutMapping("/reset-password")
