@@ -20,6 +20,13 @@ public class PermissionsController {
         return this.thePermissionRepository.findAll();
     }
 
+    @GetMapping("{id}")
+    public Permission findById(@PathVariable String id){
+        return this.thePermissionRepository
+                .findById(id)
+                .orElse(null);
+    }
+
     @PutMapping("{id}")
     public Permission update(@PathVariable String id, @RequestBody Permission thePermission){
         Permission thePermissionToUpdate = this.thePermissionRepository

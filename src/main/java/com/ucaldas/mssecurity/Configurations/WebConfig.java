@@ -3,6 +3,7 @@ package com.ucaldas.mssecurity.Configurations;
 import com.ucaldas.mssecurity.Interceptors.SecurityInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -12,11 +13,17 @@ public class WebConfig implements WebMvcConfigurer {
     private SecurityInterceptor securityInterceptor;
 
     @Override
-     public void addInterceptors(InterceptorRegistry registry) {
-
+    public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(securityInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/public/**", "/api/users/public/**");
+    }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*");
     }
 }
