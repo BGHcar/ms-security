@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 
 import com.ucaldas.mssecurity.Models.Role;
 import com.ucaldas.mssecurity.Models.User;
+import com.ucaldas.mssecurity.Notifications.EmailSender;
 import com.ucaldas.mssecurity.Repositories.RoleRepository;
 import com.ucaldas.mssecurity.Repositories.UserRepository;
 
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
@@ -24,6 +26,8 @@ import java.util.regex.Pattern;
 public class UsersController {
     @Autowired
     private UserRepository theUserRepository;
+
+
 
     @Autowired
     private EncryptionService theEncryptionService;
@@ -44,8 +48,15 @@ public class UsersController {
             System.err.println("El email ya está registrado o no es válido");
             return null;
         }
+        Map<String, String> env = EmailSender.getEnvVariables(".env");
+
+        String client_role = env.get("CLIENT_ROLE");
         theNewUser.setPassword(theEncryptionService.convertSHA256(theNewUser.getPassword()));
-        return this.theUserRepository.save(theNewUser);}
+        System.out.println("usuario creado");
+        this.theUserRepository.save(theNewUser);
+        matchRole(theNewUser.get_id(), client_role);
+        return theNewUser;
+    }
     
     @GetMapping("{id}")
     public User findById(@PathVariable String id) {
