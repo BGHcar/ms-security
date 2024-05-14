@@ -53,11 +53,7 @@ public class SecurityController {
     }
 
     @PutMapping("/secondauth")
-<<<<<<< HEAD
     public Map<String,String> secondAuth(@RequestBody Map<String, String> requestBody,
-=======
-    public Map<String, String> secondAuth(@RequestBody Map<String, String> requestBody,
->>>>>>> a884f57b86221e4d93c1a15f4cc5c619aa5a5e49
                              final HttpServletResponse response) throws IOException{
         String id = requestBody.get("id");
         User theUser = this.theUserRepository
