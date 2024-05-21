@@ -155,7 +155,7 @@ public class UsersController {
         if (StringUtils.isEmpty(password)) {
             return false;
         }
-        boolean isValidFormat = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$")
+        boolean isValidFormat = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$") // Mínimo 8 caracteres, al menos una letra mayúscula, una letra minúscula y un número
                 .matcher(password).matches();
         return isValidFormat;
     }
