@@ -1,8 +1,9 @@
 package com.ucaldas.mssecurity.Controllers;
+
 import com.ucaldas.mssecurity.Notifications.EmailSender;
+
+import java.util.HashMap;
 import java.util.Map;
-
-
 
 import com.ucaldas.mssecurity.Models.User;
 import com.ucaldas.mssecurity.Repositories.UserRepository;
@@ -12,9 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.io.IOException;
-
 
 @CrossOrigin
 @RestController
@@ -30,8 +29,8 @@ public class SecurityController {
     private JwtService theJwtService;
 
     @PostMapping("/login")
-    public Map <String, String> login(@RequestBody User theUser,
-                        final HttpServletResponse response) throws IOException{
+    public Map<String, String> login(@RequestBody User theUser,
+            final HttpServletResponse response) throws IOException {
         String token = "";
         User theActualUser = this.theUserRepository.getUserByEmail(theUser.getEmail());
         if (theActualUser != null) {
@@ -42,10 +41,9 @@ public class SecurityController {
                 theActualUser.setToken(token);
                 this.theUserRepository.save(theActualUser);
                 emailSender.sendEmail(theActualUser.getEmail(), token);
-                
 
-                 // token = theJwtService.generateToken(theActualUser);
-            }else {
+                // token = theJwtService.generateToken(theActualUser);
+            } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
             }
         }
@@ -53,12 +51,13 @@ public class SecurityController {
     }
 
     @PutMapping("/secondauth")
-    public Map<String,String> secondAuth(@RequestBody Map<String, String> requestBody,
-                             final HttpServletResponse response) throws IOException{
+    public HashMap<String, Object> secondAuth(@RequestBody Map<String, String> requestBody,
+            final HttpServletResponse response) throws IOException {
+        HashMap<String, Object> theResponse = new HashMap<>();
         String id = requestBody.get("id");
         User theUser = this.theUserRepository
-                                .findById(id)
-                                .orElse(null);
+                .findById(id)
+                .orElse(null);
         String token = requestBody.get("token");
         User theActualUser = this.theUserRepository.getUserByEmail(theUser.getEmail());
         if (theActualUser != null) {
@@ -66,42 +65,44 @@ public class SecurityController {
                 token = theJwtService.generateToken(theActualUser);
                 theActualUser.setToken(null);
                 this.theUserRepository.save(theActualUser);
-            }else {
+                theResponse.put("token", token);
+                theResponse.put("user", theActualUser);
+            } else {
                 // theActualUser.setToken(null);
                 // this.theUserRepository.save(theActualUser);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Second auth failed");
-
+                return theResponse;
             }
         }
-        return Map.of("token", token);
+        return theResponse;
     }
 
     @PutMapping("/reset-password")
     public String reseetPass(@RequestBody User theUser,
-                        final HttpServletResponse response) throws IOException{
+            final HttpServletResponse response) throws IOException {
         String token = "";
         User theActualUser = this.theUserRepository.getUserByEmail(theUser.getEmail());
         if (theActualUser != null) {
 
-                token = EmailSender.generateRandomWord();
-                EmailSender emailSender = new EmailSender();
-                theActualUser.setToken(token);
-                this.theUserRepository.save(theActualUser);
-                emailSender.sendEmail(theActualUser.getEmail(), token);
-                
-            }else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
-            }
-    
+            token = EmailSender.generateRandomWord();
+            EmailSender emailSender = new EmailSender();
+            theActualUser.setToken(token);
+            this.theUserRepository.save(theActualUser);
+            emailSender.sendEmail(theActualUser.getEmail(), token);
+
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
+        }
+
         return "message: 'Email sent to your email address'";
     }
 
     @PutMapping("/change-password/{id}")
     public String changePassword(@PathVariable String id, @RequestBody Map<String, String> requestBody,
-                             final HttpServletResponse response) throws IOException{
+            final HttpServletResponse response) throws IOException {
         User theActualUser = this.theUserRepository
-                                .findById(id)
-                                .orElse(null);
+                .findById(id)
+                .orElse(null);
         String token = requestBody.get("token");
         System.err.println(token);
         if (theActualUser != null) {
@@ -109,16 +110,12 @@ public class SecurityController {
                 theActualUser.setPassword(theEncryptionService.convertSHA256(requestBody.get("password")));
                 theActualUser.setToken(null);
                 this.theUserRepository.save(theActualUser);
-            }else {
+            } else {
 
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "INVALID TOKEN");
             }
         }
         return "message: 'Password changed successfully'";
     }
-    
+
 }
-    
-
-
-
