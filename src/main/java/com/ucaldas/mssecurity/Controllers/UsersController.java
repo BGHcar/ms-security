@@ -55,18 +55,12 @@ public class UsersController {
 
         String client_role = env.get("CLIENT_ROLE");
         theNewUser.setPassword(theEncryptionService.convertSHA256(theNewUser.getPassword()));
-<<<<<<< HEAD
         System.out.println("usuario creado");
         this.theUserRepository.save(theNewUser);
         matchRole(theNewUser.get_id(), client_role);
         return theNewUser;
     }
     
-=======
-        return this.theUserRepository.save(theNewUser);
-    }
-
->>>>>>> a884f57b86221e4d93c1a15f4cc5c619aa5a5e49
     @GetMapping("{id}")
     public User findById(@PathVariable String id) {
         User theUser = this.theUserRepository
