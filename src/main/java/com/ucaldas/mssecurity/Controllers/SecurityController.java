@@ -28,6 +28,7 @@ public class SecurityController {
     @Autowired
     private JwtService theJwtService;
 
+    @SuppressWarnings("null")
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody User theUser,
             final HttpServletResponse response) throws IOException {
@@ -45,9 +46,13 @@ public class SecurityController {
                 // token = theJwtService.generateToken(theActualUser);
             } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
+                return null;
             }
+
+        }else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
         }
-        return Map.of("id", theActualUser.get_id(), "token", token);
+        return Map.of("token", token, "id", theActualUser.get_id());
     }
 
     @PutMapping("/secondauth")
